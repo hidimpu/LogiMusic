@@ -19,8 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 
 const spotifyApi = new SpotifyWebApi({
 	redirectUri: 'http://localhost:3000',
-	clientId: 'e6b0eaeb0346417db36520eb93e86612',
-	clientSecret: '42b2a21559a34015a0d62fa2e54335a5',
+	clientId: '91d5fbc74b674c81ae10609d05fd1483',
+	clientSecret: 'e0342d2e5b8942a7bceeb7eeb0a1b9ff',
 });
 
 app.post('/refresh', (req, res) => {
@@ -71,7 +71,6 @@ app.get('/lyrics', async (req, res) => {
 app.post('/song', async (req, res) => {
 	const { song } = req.body;
 
-	console.log(song);
 	const api = new YoutubeMusicApi();
 
 	async function getStreamUrl(songId) {
@@ -81,16 +80,15 @@ app.post('/song', async (req, res) => {
 		return format.url;
 	}
 
-	api.initalize().then((info) => {
-		api.search(`${song.title} ${song.artist}`).then((result) => {
-			console.log(result.content[0].videoId);
-			const videoId = result.content[0].videoId;
+	await api.initalize();
+	const result = await api.search(`${song.title} ${song.artist}`);
 
-			console.log(getStreamUrl(videoId));
-		});
-	});
+	const videoId = result.content[0].videoId;
+	const playerUri = await getStreamUrl(videoId);
 
-	res.status(200);
+
+
+	res.status(200).send(playerUri);
 });
 
 // app.get("/song", async (req, res) => {

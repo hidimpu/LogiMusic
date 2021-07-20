@@ -1,125 +1,124 @@
-import { useState, useEffect } from "react";
-import useAuth from "./useAuth";
+import { useState, useEffect } from 'react';
+import useAuth from './useAuth';
 
-import { Container, Form } from "react-bootstrap";
-import SpotifyWebApi from "spotify-web-api-node";
+import { Container, Form } from 'react-bootstrap';
+import SpotifyWebApi from 'spotify-web-api-node';
 
-import TrackSearchResult from "./TrackSearchResult";
+import TrackSearchResult from './TrackSearchResult';
+import Player from './Player';
+import axios from 'axios';
 
-import Player from "./Player";
-
-import axios from "axios";
-
-// const api = new YoutubeMusicAPI();
-
-// const spotifyApi = new SpotifyWebApi();
 const spotifyApi = new SpotifyWebApi({
-  clientId: "767eac21cf65444ea0039735d46e71d3",
+	clientId: '91d5fbc74b674c81ae10609d05fd1483',
 });
 
-// const spoti = new SpotifyWebApi({
-//   clientId: "767eac21cf65444ea0039735d46e71d3",
-// });
-// const SpotifyToYoutube = require("spotify-to-youtube");
-
-// async function hehe() {
-//   const spotifyToYoutube = SpotifyToYoutube(spoti);
-//   const id = await spotifyToYoutube("spotify:track:3djNBlI7xOggg7pnsOLaNm");
-//   console.log(id);
-// }
-// hehe();
-
 export default function Dashboard({ code }) {
-  const accessToken = useAuth(code);
-  const [search, setSearch] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [playingTrack, setPlayingTrack] = useState();
-  const [lyrics, setLyrics] = useState("");
-  //   console.log(searchResults);
+	const accessToken = useAuth(code);
 
-  function chooseTrack(track) {
-    setPlayingTrack(track);
-    setSearch("");
-    setLyrics("");
-  }
+	const [search, setSearch] = useState('');
+	const [searchResults, setSearchResults] = useState([]);
+	const [playingTrack, setPlayingTrack] = useState();
+	const [lyrics, setLyrics] = useState('');
+	const [trackUri, setTrackUri] = useState('');
 
-  useEffect(() => {
-    if (!playingTrack) return;
+	function chooseTrack(track) {
+		setPlayingTrack(track);
+		setSearch('');
+		setLyrics('');
+	}
 
-    axios
-      .get("http://localhost:3001/lyrics", {
-        params: {
-          track: playingTrack.title,
-          artist: playingTrack.artist,
-        },
-      })
-      .then((res) => setLyrics(res.data.lyrics));
-  }, [playingTrack]);
+	useEffect(() => {
+		if (!playingTrack) return;
 
-  useEffect(() => {
-    if (!accessToken) return;
-    spotifyApi.setAccessToken(accessToken);
-  }, [accessToken]);
+		axios
+			.get('http://localhost:3001/lyrics', {
+				params: {
+					track: playingTrack.title,
+					artist: playingTrack.artist,
+				},
+			})
+			.then((res) => setLyrics(res.data.lyrics));
+	}, [playingTrack]);
 
-  useEffect(() => {
-    if (!search) return setSearchResults([]);
-    if (!accessToken) return;
+	useEffect(() => {
+		if (!accessToken) return;
+		spotifyApi.setAccessToken(accessToken);
+	}, [accessToken]);
 
-    let cancel = false;
+	useEffect(() => {
+		if (!search) return setSearchResults([]);
+		if (!accessToken) return;
 
-    spotifyApi.searchTracks(search).then((res) => {
-      if (cancel) return;
+		let cancel = false;
 
-      setSearchResults(
-        res.body.tracks.items.map((track) => {
-          const smallestAlbumImage = track.album.images.reduce(
-            (smallest, image) => {
-              if (image.height < smallest.height) return image;
-              return smallest;
-            },
-            track.album.images[0]
-          );
-          return {
-            artist: track.artists[0].name,
-            title: track.name,
-            uri: track.uri,
-            albumUrl: smallestAlbumImage.url,
-          };
-        })
-      );
-    });
+		spotifyApi.searchTracks(search).then((res) => {
+			if (cancel) return;
 
-    return () => (cancel = true);
-  }, [search, accessToken]);
+			setSearchResults(
+				res.body.tracks.items.map((track) => {
+					const smallestAlbumImage = track.album.images.reduce(
+						(smallest, image) => {
+							if (image.height < smallest.height) return image;
+							return smallest;
+						},
+						track.album.images[0]
+					);
+					return {
+						artist: track.artists[0].name,
+						title: track.name,
+						uri: track.uri,
+						albumUrl: smallestAlbumImage.url,
+					};
+				})
+			);
+		});
 
-  return (
-    <Container className="d-flex flex-column py-2" style={{ height: "100vh" }}>
-      <Form.Control
-        type="search"
-        placeholder="Search Songs/Artists "
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+		return () => (cancel = true);
+	}, [search, accessToken]);
 
-      <div className="flex-grow-1 my-2" style={{ overflowY: "auto" }}>
-        {searchResults.map((track) => (
-          <TrackSearchResult
-            track={track}
-            key={track.uri}
-            chooseTrack={chooseTrack}
-          />
-        ))}
-        {searchResults.length === 0 && (
-          <div className="text-center" style={{ whitespace: "pre" }}>
-            {lyrics}
-          </div>
-        )}
-        Songs
-      </div>
+	async function handlePlay(track) {
+		chooseTrack(track);
+		const song = { title: track.title, artist: track.artist };
 
-      <div>
-        <Player accessToken={accessToken} track={playingTrack?.uri} />
-      </div>
-    </Container>
-  );
+		const { data } = await axios.post('http://localhost:3001/song', {
+			song,
+		});
+
+		setTrackUri(data);
+	}
+
+	return (
+		<Container
+			className="d-flex flex-column py-2"
+			style={{ height: '100vh' }}
+		>
+			<Form.Control
+				type="search"
+				placeholder="Search Songs/Artists "
+				value={search}
+				onChange={(e) => setSearch(e.target.value)}
+			/>
+
+			<div className="flex-grow-1 my-2" style={{ overflowY: 'auto' }}>
+				{searchResults.map((track) => (
+					<TrackSearchResult
+						track={track}
+						key={track.uri}
+						chooseTrack={chooseTrack}
+						handlePlay={handlePlay}
+					/>
+				))}
+				{searchResults.length === 0 && (
+					<div className="text-center" style={{ whitespace: 'pre' }}>
+						{lyrics}
+					</div>
+				)}
+				Songs
+			</div>
+
+			<div>
+				<Player trackUri={trackUri} />
+			</div>
+		</Container>
+	);
 }

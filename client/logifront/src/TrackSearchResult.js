@@ -1,31 +1,25 @@
 import React from 'react';
-import axios from 'axios';
 
-// const YoutubeMusicApi = require("youtube-music-api");
+export default function TrackSearchResult({ track, chooseTrack, handlePlay }) {
+	// async function handlePlay() {
+	// 	chooseTrack(track);
+	// 	const song = { title: track.title, artist: track.artist };
 
-export default function TrackSearchResult({ track, chooseTrack }) {
-	async function handlePlay() {
-		// const api = new YoutubeMusicApi();
-		// api.initalize().then((info) => {
-		//   api.search(track.title + " " + track.artist).then((results) => {
-		//     streamId(results);
-		//     console.log(results);
-		//   });
-		// });
+	// 	const { data } = await axios.post('http://localhost:3001/song', {
+	// 		song,
+	// 	});
+	// 	console.log(data);
+	// }
 
-		chooseTrack(track);
-		const song = { title: track.title, artist: track.artist };
-
-		await axios.post('http://localhost:3001/song', { song });
-	}
 	return (
 		<div
 			className="d-flex m-2 align-items-center"
 			style={{ cursor: 'pointer' }}
-			onClick={handlePlay}
+			onClick={() => handlePlay(track)}
 		>
 			<img
 				src={track.albumUrl}
+				alt={'song'}
 				style={{ height: '64px', width: '64px  ' }}
 			/>
 			<div className="ml-3">
