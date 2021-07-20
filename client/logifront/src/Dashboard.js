@@ -10,9 +10,24 @@ import Player from "./Player";
 
 import axios from "axios";
 
+// const api = new YoutubeMusicAPI();
+
+// const spotifyApi = new SpotifyWebApi();
 const spotifyApi = new SpotifyWebApi({
   clientId: "767eac21cf65444ea0039735d46e71d3",
 });
+
+// const spoti = new SpotifyWebApi({
+//   clientId: "767eac21cf65444ea0039735d46e71d3",
+// });
+// const SpotifyToYoutube = require("spotify-to-youtube");
+
+// async function hehe() {
+//   const spotifyToYoutube = SpotifyToYoutube(spoti);
+//   const id = await spotifyToYoutube("spotify:track:3djNBlI7xOggg7pnsOLaNm");
+//   console.log(id);
+// }
+// hehe();
 
 export default function Dashboard({ code }) {
   const accessToken = useAuth(code);
@@ -101,8 +116,9 @@ export default function Dashboard({ code }) {
         )}
         Songs
       </div>
+
       <div>
-        <Player accessToken={accessToken} trackUri={playingTrack?.uri} />
+        <Player accessToken={accessToken} track={playingTrack?.uri} />
       </div>
     </Container>
   );

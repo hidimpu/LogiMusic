@@ -1,7 +1,17 @@
 import React from "react";
 
+// const YoutubeMusicApi = require("youtube-music-api");
+
 export default function TrackSearchResult({ track, chooseTrack }) {
   function handlePlay() {
+    // const api = new YoutubeMusicApi();
+    // api.initalize().then((info) => {
+    //   api.search(track.title + " " + track.artist).then((results) => {
+    //     streamId(results);
+    //     console.log(results);
+    //   });
+    // });
+
     chooseTrack(track);
   }
   return (

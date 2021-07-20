@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "lyrics-finder": "^21.7.0",
+    "spotify-to-youtube": "^1.0.1",
     "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {

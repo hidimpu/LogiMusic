@@ -70,4 +70,10 @@ app.get("/lyrics", async (req, res) => {
   res.json({ lyrics });
 });
 
+// app.get("/song", async (req, res) => {
+//   const spotifyToYoutube = SpotifyToYoutube(spotifyApi);
+//   const id = await spotifyToYoutube(req.query.trackUri);
+//   console.log(id); // J7_bMdYfSws
+// });
+
 app.listen(3001);
