@@ -1,6 +1,10 @@
+require("dotenv").config();
+
 const express = require("express");
 
 const cors = require("cors");
+
+var port = process.env.PORT || 3001;
 
 const bodyParser = require("body-parser");
 
@@ -18,9 +22,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const spotifyApi = new SpotifyWebApi({
-  redirectUri: "http://localhost:3000",
-  clientId: "767eac21cf65444ea0039735d46e71d3",
-  clientSecret: "53e6f75a67e94143b05110aba78c06fc",
+  redirectUri: process.env.REDIRECT_URI,
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
 });
 
 app.post("/refresh", (req, res) => {
@@ -96,4 +100,6 @@ app.post("/song", async (req, res) => {
 //   console.log(id); // J7_bMdYfSws
 // });
 
-app.listen(3001);
+app.listen(port, () => {
+  console.log(`LogiMusic Server up on Port ${port} Enjoy! :)  `);
+});
